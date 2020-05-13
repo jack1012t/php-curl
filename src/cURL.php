@@ -310,11 +310,24 @@ class cURL
 		$headerSize = curl_getinfo($this->ch, CURLINFO_HEADER_SIZE);
 
 		$headers = substr($response, 0, $headerSize);
+
+		// updates to handle AWS response headers, so they don't barf in Response.php#parseHeaders, line 90:
+		$headerArr = explode("\r\n", $headers);
+		$filteredHeaders = [];
+		foreach($headerArr as $header) {
+			if(strpos($header, 'X-EdgeConnect') === FALSE && strlen($header) > 0) {
+				array_push($filteredHeaders, $header);
+			}
+		}
+		$filteredHeaders = implode("\r\n", $filteredHeaders);
+		// need to recalculate headerSize here.
+		// updates to handle AWS response headers, so they don't barf in Response.php#parseHeaders, line 90:
+
 		$body = substr($response, $headerSize);
 
 		$class = $this->responseClass;
 
-		return new $class($body, $headers, $info);
+		return new $class($body, $filteredHeaders, $info);
 	}
 
 	/**
