@@ -320,7 +320,6 @@ class cURL
 			}
 		}
 		$filteredHeaders = implode("\r\n", $filteredHeaders);
-		// need to recalculate headerSize here.
 		// updates to handle AWS response headers, so they don't barf in Response.php#parseHeaders, line 90:
 
 		$body = substr($response, $headerSize);
